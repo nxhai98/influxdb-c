@@ -12,12 +12,14 @@
 
 # include <stddef.h>
 # include "client.h"
+# include "point.h"
 
 # define INFLUXDB_SERIES_STEP 64
 
 typedef void (*influxdb_series_free_callback)(char **row);
 
-typedef struct influxdb_series {
+typedef struct influxdb_series
+{
     char   *name;
     char   **columns;
     char   ***points;
