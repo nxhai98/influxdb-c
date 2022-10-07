@@ -9,6 +9,13 @@
 #ifndef POINT_H_
 # define POINT_H_
 
+/* TODO need define some rules for error code an it desctiption */
+#define INF_OK 0
+#define INF_ERROR 1
+#define INF_WARNING 2
+#define INF_TYPE_ 1
+
+
 typedef enum FieldType
 {
     INF_BOOL,
@@ -54,4 +61,14 @@ void influxdb_point_add_field_float(s_influxdb_point *point, char *name, float v
 void influxdb_point_add_field_string(s_influxdb_point *point, char *name, const char *val);
 void influxdb_point_add_field_bool(s_influxdb_point *point, char *name, bool val);
 void influxdb_point_add_field_null(s_influxdb_point *point, char *name);
+
+/*
+ * get data from point
+ * TODO: need using status/ERROR code instead of bool
+ */
+bool influxdb_point_get_time(s_influxdb_point *point, unsigned long long *time);
+bool influxdb_point_get_tag(s_influxdb_point *point, const char *name, char **out);
+bool influxdb_point_get_field(s_influxdb_point *point, const char *name, FieldType target_type, void *target_value_ptr);
+bool influxdb_point_to_line_protocol(s_influxdb_point *point);
+
 #endif POINT_H_
