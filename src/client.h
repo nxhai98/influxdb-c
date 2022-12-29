@@ -11,9 +11,12 @@
 # define CLIENT_H_
 
 # include <stdlib.h>
+# include <curl/curl.h>
 
 # include "config.h"
+# include "inf_error.h"
 
+// TODO: remove json parser
 # ifdef HAVE_JSON_0
 #  include <json/json.h>
 # else
@@ -22,13 +25,74 @@
 
 # define INFLUXDB_URL_MAX_SIZE 1024
 
-typedef struct influxdb_client {
+typedef enum InfApiVersion
+{
+    INFLUXDB_API_V1,
+    INFLUXDB_API_V2
+} InfApiVersion;
+
+/*
+ * influxdb http connection information
+ */
+typedef struct influxdb_client
+{
     char *schema;
     char *host;
+    char ssl;
+
+    /* basic authentication */
     char *username;
     char *password;
-    char *database;
-    char ssl;
+    /* token authentication, higher priority than basic auth */
+    char *token;
+
+    /* API version */
+    InfApiVersion api_version;
+
+    char *database; /* use as bucket in api v2 */
+
+    /* ------------------------------------------------------------ */
+    /* influxdb v1 options */
+    /* ------------------------------------------------------------ */
+
+    /* query option */
+    /*
+     * Returns epoch timestamps with the specified precision.
+     * By default, InfluxDB returns timestamps in RFC3339 format with nanosecond precision
+     */
+    char *epoch;
+
+    /*
+     * Returns points in streamed batches instead of in a single response.
+     * If set to true, InfluxDB chunks responses by series or by every 10,000 points,
+     * whichever occurs first.
+     */
+    bool chunked;
+
+    /*
+     * If set to a specific value, InfluxDB chunks responses by series or by that number of points.
+     */
+    size_t chunk_size;
+
+    /* write option */
+    char *rp;
+    char *precision;
+    /* ------------------------------------------------------------ */
+
+
+    /* ------------------------------------------------------------ */
+    /* influxdb v2 options */
+    /* ------------------------------------------------------------ */
+    /* An organization name or ID. */
+    char *org;
+    /* An organization name or ID. */
+    char *org_id
+
+    /* ------------------------------------------------------------ */
+    /* curl handle */
+    /* ------------------------------------------------------------ */
+    CURL *read_handle;
+    CURL *write_handle;
 } s_influxdb_client;
 
 /**
@@ -41,6 +105,8 @@ s_influxdb_client *influxdb_client_new(char *host,
                                        char *password,
                                        char *database,
                                        char ssl);
+
+// some APIs for setting 
 
 /**
  * Clean memory used by a client

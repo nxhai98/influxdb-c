@@ -26,49 +26,38 @@ typedef enum FieldType
     INF_TIME    /* may be unused, treat as string */
 };
 
-typedef union InfluxFieldData
-{
-    bool b;
-    unsigned long ui;
-    long i;
-    char *s;
-    float f;
-};
-
 typedef struct s_influxdb_point
 {
     /* unix time */
-    unsigned long long       _time;
+    unsigned long long   _unix_time;
+    char                *_time;
 
     /* Tags info */
-    char           **_tag_name;
-    char           **_tags;
-    int              _tag_len;
+    char          **_tag_name;
+    char          **_tags;          /* tag always not null */
+    int             _tag_num;
 
     /* Field info */
-    char           **_val_names;
-    InfluxFieldData *_vals;
-    bool            *isnulls;
-    FieldType       *_val_types;
-    int              _field_len;     /* with flux query len may be 1 */
+    char          **_val_names;
+    char          **_vals;          /* CSV return char* => any conversion will making bad performance */
+    size_t         *_val_sizes;
+    bool           *isnulls;
+    FieldType      *_val_types;
+    int             _field_num;     /* with flux query len may be 1 */
 } s_influxdb_point;
 
-void influxdb_point_free(s_influxdb_point *point);
-void influxdb_point_set_time(s_influxdb_point *point, unsigned long long time);
-void influxdb_point_add_tag(s_influxdb_point *point, char *name, char *tag_val);
-void influxdb_point_add_field_int64(s_influxdb_point *point, char *name, long val);
-void influxdb_point_add_field_float(s_influxdb_point *point, char *name, float val);
-void influxdb_point_add_field_string(s_influxdb_point *point, char *name, const char *val);
-void influxdb_point_add_field_bool(s_influxdb_point *point, char *name, bool val);
-void influxdb_point_add_field_null(s_influxdb_point *point, char *name);
+void inf_point_free(s_influxdb_point *point);
+void inf_point_set_time(s_influxdb_point *point, unsigned long long time);
+void inf_point_add_tag(s_influxdb_point *point, char *name, char *tag_val);
+void inf_point_add_field(s_influxdb_point *point, char *name, INF_POINTER val, FieldType type);
 
 /*
  * get data from point
  * TODO: need using status/ERROR code instead of bool
  */
-bool influxdb_point_get_time(s_influxdb_point *point, unsigned long long *time);
-bool influxdb_point_get_tag(s_influxdb_point *point, const char *name, char **out);
-bool influxdb_point_get_field(s_influxdb_point *point, const char *name, FieldType target_type, void *target_value_ptr);
-bool influxdb_point_to_line_protocol(s_influxdb_point *point);
+bool inf_point_get_time(s_influxdb_point *point, unsigned long long *time);
+bool inf_point_get_tag(s_influxdb_point *point, const char *name, char **out);
+bool inf_point_get_field(s_influxdb_point *point, const char *name, FieldType target_type, void *target_value_ptr);
+bool inf_point_to_line_protocol(s_influxdb_point *point);
 
 #endif POINT_H_

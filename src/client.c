@@ -7,7 +7,6 @@
  *
  */
 
-#include <curl/curl.h>
 #include <string.h>
 
 #include "client.h"

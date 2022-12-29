@@ -29,7 +29,7 @@ influxdb_strdup(const char *s)
 }
 
 void
-influxdb_reset_string_info(string_info *str)
+influxdb_reset_string_info(s_string_info *str)
 {
     str->data[0] = '\0';
 	str->len = 0;
@@ -42,13 +42,13 @@ influxdb_reset_string_info(string_info *str)
  * to describe an empty string.
  */
 static void
-influxdb_init_string_info(string_info *str)
+influxdb_init_string_info(s_string_info *str)
 {
     int            size = 1024;    /* initial default buffer size */
 
     str->data = (char *) malloc(sizeof(char) * size);
     str->len = 0;
-    str->max_len = size;
+    str->maxlen = size;
     influxdb_reset_string_info(str);
 }
 
@@ -57,12 +57,12 @@ influxdb_init_string_info(string_info *str)
  *
  * @return string_info*
  */
-string_info *
+s_string_info *
 influxdb_make_string_info()
 {
-    string_info    *res;
+    s_string_info    *res;
 
-    res = (string_info *) malloc(sizeof(string_info));
+    res = (s_string_info *) malloc(sizeof(s_string_info));
 
     influxdb_init_string_info(res);
 
@@ -76,7 +76,7 @@ influxdb_make_string_info()
  * @param needed
  */
 static void
-influxdb_enlarge_string_info(string_info *buf, int needed)
+influxdb_enlarge_string_info(s_string_info *buf, int needed)
 {
     int     newlen;
 
@@ -109,7 +109,7 @@ influxdb_enlarge_string_info(string_info *buf, int needed)
  * @param s
  */
 void
-influxdb_string_append_string(string_info *buf, char *s)
+influxdb_string_append_string(s_string_info *buf, char *s)
 {
     int datalen = strlen(s);
 

@@ -23,6 +23,8 @@ extern "C" {
 # include "database_user.h"
 # include "query.h"
 
+typedef void* INF_POINTER;
+
 #ifdef __cplusplus
 }
 #endif
